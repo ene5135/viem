@@ -1,3 +1,4 @@
+import { isBytesEqual } from '~viem/utils/data/isBytesEqual.js'
 import type { Client } from '../../clients/createClient.js'
 import type { Transport } from '../../clients/transports/createTransport.js'
 import { BlockNotFoundError } from '../../errors/block.js'
@@ -272,9 +273,10 @@ export async function waitForTransactionReceipt<
                   const replacementTransaction = (
                     block.transactions as {} as Transaction[]
                   ).find(
-                    ({ from, nonce }) =>
+                    ({ from, nonce, hash }) =>
                       from === replacedTransaction!.from &&
-                      nonce === replacedTransaction!.nonce,
+                      nonce === replacedTransaction!.nonce &&
+                      !isBytesEqual(hash, replacedTransaction!.hash),
                   )
 
                   // If we couldn't find a replacement transaction, continue polling.
